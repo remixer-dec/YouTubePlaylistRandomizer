@@ -18,7 +18,7 @@
 				<span class="logo">YouTube Playlist Randomizer</span>
 			</div>
     		<div class="bigline" v-show="tab == 1">
-				<input type="text" v-model="cfg.playlistURL" placeholder="YouTube Playlist Link" id="link" @keyup.Enter="okClicked"> <button id="ok" @click="okClicked">OK</button>
+				<input type="text" v-model="cfg.playlistURL" placeholder="YouTube Playlist Link" id="link" @keyup.Enter="okClicked" :disabled="!status.playerReady"> <button id="ok" @click="okClicked" :disabled="!status.playerReady">OK</button>
 				<div id="info" :class="infoClass" v-show="info">{{info}}</div>
 			</div>
 			<div class="gencfg" v-show="tab == 1">
@@ -57,13 +57,14 @@
 				<div v-if='cfg.saveSeed && !cfg.savePos' class="info info-zero info-warn">You will get the same order after every page refresh, if you're not saving the position</div>
 			</div>
 			<div id="activePlaylist" v-show="tab == 2">
-				<div>Current playlist: {{playlistIDShort}} ({{cfg.videos}} videos) <button type="button" name="button">Edit</button></div>
+				<div>Current playlist: {{playlistIDShort}} ({{cfg.videos}} videos) <button type="button" name="button" @click="editPlaylist">Edit</button></div>
 				<div>Seed: {{cfg.seed}}. Iterations: {{cfg.pos}}. Completions: 0</div>
 			</div>
 			<div class="playerwrap" v-show="tab == 2">
 				<div id="player"></div>
 			</div>
     	</div>
+		<div id="eg" title="eg?"></div>
 	</div>
 	<script src="seeded_randomizers.js"></script>
 	<script src="https://www.youtube.com/iframe_api"></script>

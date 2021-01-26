@@ -1,27 +1,38 @@
 var player;
+
 function onYouTubeIframeAPIReady() {
-  player = new YT.Player('player', {
-    height: '400px',
-    width: '100%',
-    videoId: 'M7lc1UVf-VE',
-    playerVars: { 'autoplay': 0, 'controls': 1 },
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
+    player = new YT.Player('player', {
+        height: '400px',
+        width: '100%',
+        videoId: 'M7lc1UVf-VE',
+        playerVars: {
+            'autoplay': 0,
+            'controls': 0
+        },
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange,
+            'onError': onYTError
+        }
+    });
 }
 
-
+function onYTError(e) {
+    console.warn(e)
+}
 function onPlayerReady(event) {
-  //event.target.playVideo();
+    app.status.playerReady = true
 }
 
 function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.ENDED) {
-      console.log('ENDED')
-      //player.playVideoAt(0)
-  }
+    switch (event.data) {
+        case YT.PlayerState.ENDED:
+            console.log('ENDED')
+        break;
+        case YT.PlayerState.PLAYING:
+            app.status.playlistLoaded = true
+        break;
+    }
 }
 
 var app = new Vue({
@@ -29,7 +40,7 @@ var app = new Vue({
     'data': {
         'tab': 1,
         'initcfg': function() {
-            return  {
+            return {
                 'rng': 3,
                 'savePlaylist': true,
                 'savePos': true,
@@ -45,11 +56,15 @@ var app = new Vue({
         },
         'cfg': false,
         'info': '',
-        'infoClass': ''
+        'infoClass': '',
+        'status': {
+            'playerReady': false,
+            'playlistLoaded': false
+        }
     },
     'computed': {
         'playlistIDShort': function() {
-            return this.playlistID? this.playlistID.slice(0,3) + '..' + this.playlistID.slice(-3) : ''
+            return this.cfg.playlistID ? this.cfg.playlistID.slice(0, 3) + '..' + this.cfg.playlistID.slice(-3) : ''
         }
     },
     'methods': {
@@ -60,17 +75,49 @@ var app = new Vue({
                 this.cfg.playlistURL = ''
                 return false
             }
-            this.msg('success', 'Playlist ID: '+this.cfg.playlistID)
+            this.msg('success', 'Loading...')
+            player.loadPlaylist({
+                list: this.cfg.playlistID,
+                listType: 'playlist'
+            })
+            setTimeout(function(that) {
+                if (!that.status.playlistLoaded && player.getPlayerState() == 5) {
+                    that.msg('error', 'Unable to load the playlist. Please check if it\'s public.')
+                }
+            }, 3000, this)
         },
         'okClicked': function() {
             this.loadPlaylist()
+        },
+        'editPlaylist': function() {
+            player.stopVideo()
+            player.clearVideo()
+            this.tab = 1
         },
         'msg': function(mclass, message) {
             this.infoClass = 'info' + (mclass ? (' info-' + mclass) : '')
             this.info = message
         },
         'saveConfig': function() {
-            localStorage['ytrng-cfg'] = JSON.stringify(this.cfg)
+            var cfg = Object.assign({}, this.cfg)
+            cfg.pos = cfg.savePos ? cfg.pos : 0
+            cfg.seed = cfg.saveSeed ? cfg.seed : false
+            cfg.playlistID = cfg.savePlaylist ? cfg.playlistID : ''
+            cfg.playlistURL = cfg.savePlaylist ? cfg.playlistURL : ''
+            localStorage['ytrng-cfg'] = JSON.stringify(cfg)
+        }
+    },
+    'watch': {
+        'status.playlistLoaded': function(val) {
+            if (val == true) {
+                this.cfg.videos = player.playerInfo.playlist.length
+                this.status.playlistLoaded = false
+                this.tab = 2
+                player.pauseVideo()
+                this.msg('', '')
+                this.cfg.seed = this.cfg.seed || Date.now()
+                //ready to generate randomized playlist
+            }
         }
     },
     'mounted': function() {

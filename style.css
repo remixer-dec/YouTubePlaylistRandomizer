@@ -71,6 +71,11 @@ input, button, select {
     outline: none;
 }
 
+input[type=checkbox] {
+    transform: scale(1.4);
+    vertical-align: middle;
+}
+
 select {
     border: none;
     height: 16px;
@@ -127,4 +132,42 @@ select {
 }
 .info-zero {
     position: absolute;
+}
+label[for=sgen]:hover:before {
+    content: 'pseudo';
+    font-size: 8px;
+    width: 0;
+    transform: translate(-28px);
+    display: inline-block;
+    color: #ddd;
+}
+#eg {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 56px;
+    height: 56px;
+}
+
+#eg:hover {
+    background-image: url(https://cdn.frankerfacez.com/emoticon/542072/2)
+}
+
+button[disabled]:before {
+    content: 'Loading...';
+    position: absolute;
+    transform: translate(-10px,0);
+    background: #e1bdbd;
+    border-radius: 2px;
+    padding: 0 10px;
+}
+
+@media (prefers-color-scheme: dark){
+    body {
+        background: #222
+    }
+    .middle {
+        color: #fff;
+        background: #222;
+    }
 }

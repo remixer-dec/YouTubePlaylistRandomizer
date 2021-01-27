@@ -1,4 +1,4 @@
-var player;
+var player
 
 function onYouTubeIframeAPIReady() {
     loadPlayer()
@@ -10,7 +10,7 @@ function loadPlayer() {
     player = new YT.Player('player', {
         height: '400px',
         width: '100%',
-        videoId: 'M7lc1UVf-VE',
+        videoId: 'dQw4w9WgXcQ',
         playerVars: {
             'autoplay': 0,
             'controls': + app.cfg.showControls
@@ -20,16 +20,32 @@ function loadPlayer() {
             'onStateChange': onPlayerStateChange,
             'onError': onYTError
         }
-    });
+    })
 }
 
 function onYTError(e) {
-    console.warn(e)
+    console.warn('YouTube error:', e.data)
+    var epos = app.cfg.pos
+    setTimeout(function(){if(app.cfg.pos == epos){app.playNextVideo()}}, 2000)
 }
 
 function onPlayerReady(event) {
     app.status.playerReady = true
     if (app.cfg.savePlaylist && app.cfg.playlistID && !app.status.controlsBoxClicked) {
+        if ('userActivation' in window.navigator) {
+            if (!window.navigator.userActivation.hasBeenActive && app.status.isMobileDevice) {
+                app.msg('warn', 'Please click here to load saved playlist.')
+                var iv = setInterval(function() {
+                    if (window.navigator.userActivation.hasBeenActive) {
+                        clearInterval(iv)
+                        app.loadPlaylist()
+                    }
+                }, 200)
+                return
+            }
+        } else {
+            app.status.noUserActivationEvent = true
+        }
         app.loadPlaylist()
     }
 }
@@ -38,10 +54,10 @@ function onPlayerStateChange(event) {
     switch (event.data) {
         case YT.PlayerState.ENDED:
             app.playNextVideo()
-        break;
+        break
         case YT.PlayerState.PLAYING:
                 app.status.playlistLoaded = true
-        break;
+        break
     }
     console.log('playstate', event.data)
 }
@@ -64,7 +80,7 @@ var app = new Vue({
                 'lap': 0,
                 'videos': 0,
                 'showControls': true,
-                'darkTheme': window.matchMedia('(prefers-color-scheme: dark)').matches,
+                'darkTheme': window.matchMedia('(prefers-color-scheme: dark)').matches
             }
         },
         'cfg': false,
@@ -74,6 +90,9 @@ var app = new Vue({
             'playerReady': false,
             'playlistLoaded': false,
             'controlsBoxClicked': false,
+            'autoPlaylistLoaderFailed': false,
+            'noUserActivationEvent': false,
+            'isMobileDevice': window.matchMedia("only screen and (max-width: 750px)").matches
         }
     },
     'playlist': [],
@@ -98,6 +117,10 @@ var app = new Vue({
                 if (!that.status.playlistLoaded && player.getPlayerState() == 5) {
                     that.msg('error', 'Unable to load the playlist. Please check if it\'s public.')
                 }
+                if (!that.status.playlistLoaded && player.getPlayerState() == -1 && that.status.noUserActivationEvent) {
+                    that.msg('warn', 'Cannot load playlist automatically. Click here to do it manually.')
+                    that.status.autoPlaylistLoaderFailed = true
+                }
             }, 3000, this)
         },
         'okClicked': function() {
@@ -106,9 +129,18 @@ var app = new Vue({
             this.cfg.pos = 0
             this.loadPlaylist()
         },
+        'infoBarClicked': function() {
+            if (this.status.autoPlaylistLoaderFailed) {
+                this.status.autoPlaylistLoaderFailed = false
+                this.status.playlistLoaded = true
+            }
+            this.msg('', '')
+
+        },
         'editPlaylist': function() {
             player.stopVideo()
             player.clearVideo()
+            this.msg('','')
             this.tab = 1
             this.status.playlistLoaded = false
         },
@@ -139,9 +171,23 @@ var app = new Vue({
                 this.cfg.pos = 0
                 this.randomizePlaylist()
             }
-            console.log('saving')
             this.saveConfig()
             player.playVideoAt(this.playlist[this.cfg.pos])
+        },
+        'playPrevVideo': function() {
+            if (this.cfg.pos > 0) {
+                this.cfg.pos -= 1
+            }
+            this.saveConfig()
+            player.playVideoAt(this.playlist[this.cfg.pos])
+        },
+        'playPause': function() {
+            var state = player.getPlayerState()
+            if (state == 2) {
+                player.playVideo()
+            } else {
+                player.pauseVideo()
+            }
         }
     },
     'watch': {
@@ -154,6 +200,7 @@ var app = new Vue({
                 this.msg('', '')
                 this.cfg.seed = this.cfg.seed || Date.now()
                 this.randomizePlaylist()
+                this.cfg.pos = this.cfg.saveSeed ? this.cfg.pos : 0
                 player.playVideoAt(this.playlist[this.cfg.pos])
             }
         },

@@ -19,7 +19,7 @@
 			</div>
     		<div class="bigline" v-show="tab == 1">
 				<input type="text" v-model="cfg.playlistURL" placeholder="YouTube Playlist Link" id="link" @keyup.Enter="okClicked" :disabled="!status.playerReady"> <button id="ok" @click="okClicked" :disabled="!status.playerReady">OK</button>
-				<div id="info" :class="infoClass" v-show="info">{{info}}</div>
+				<div id="info" :class="infoClass" v-show="info" @click="infoBarClicked">{{info}}</div>
 			</div>
 			<div class="gencfg" v-show="tab == 1">
 				<label for="sgen">Random Number Generator: </label>
@@ -40,12 +40,12 @@
 						<label for="i1">Save playlist</label>
 					</span>
 					<span title="Save the seed, so next time you open this page, you get the same random order">
-						<input type="checkbox" id="i2" v-model="cfg.saveSeed" @change="saveConfig">
+						<input type="checkbox" id="i2" v-model="cfg.saveSeed" @change="saveConfig" :disabled="!cfg.savePlaylist">
 						<label for="i2">Save seed</label>
 					</span>
 				</div><div>
 					<span title="If the seed is saved, continue generating numbers from the point you've left it">
-						<input type="checkbox" id="i3" v-model="cfg.savePos" @change="saveConfig">
+						<input type="checkbox" id="i3" v-model="cfg.savePos" @change="saveConfig" :disabled="!cfg.savePlaylist || !cfg.saveSeed">
 						<label for="i3">Save position</label>
 					</span>
 					<span title="If this is unchecked, the playlist is just shuffled, and you can't get the same items untill it finishes playing all the videos">
@@ -53,8 +53,8 @@
 						<label for="i4">Allow repetitions</label>
 					</span>
 				</div>
-				<div style="margin-top: 20px">
-					<span title="Hide controls to prevent manually switching videos">
+				<div class="mt20">
+					<span title="Hide YouTube player controls to prevent manually switching videos in default order">
 						<input type="checkbox" id="i5" v-model="cfg.showControls" @change="saveConfig" :disabled="!status.playerReady">
 						<label for="i5">Show controls</label>
 					</span>
@@ -63,15 +63,21 @@
 						<label for="i6">Dark theme</label>
 					</span>
 				</div>
+				<div class="mt20 spoiler">❓<br></div>
 				<div v-if='!cfg.saveSeed' class="info info-zero info-warn">Random seed might give you more repetitions than the same seed with saved position</div>
 				<div v-if='cfg.saveSeed && !cfg.savePos' class="info info-zero info-warn">You will get the same order after every page refresh, if you're not saving the position</div>
 			</div>
 			<div id="activePlaylist" v-show="tab == 2">
-				<div>Current playlist: {{playlistIDShort}} ({{cfg.videos}} videos) <button type="button" name="button" @click="editPlaylist">Edit</button></div>
+				<div>Current playlist: {{playlistIDShort}} ({{cfg.videos}} videos) <button type="button" id="editBtn" name="button" @click="editPlaylist">Edit</button></div>
 				<div>Seed: {{cfg.seed}} | Position: {{cfg.pos+1}}/{{cfg.videos}} | Completions: {{cfg.lap}}</div>
 			</div>
 			<div class="playerwrap" v-show="tab == 2">
 				<div id="player"></div>
+			</div>
+			<div class="mt20 controls" v-show="tab == 2">
+				<button @click="playPrevVideo" :disabled="cfg.pos == 0">⏮</button>
+				<button @click="playPause">⏯</button>
+				<button @click="playNextVideo">⏭</button>
 			</div>
     	</div>
 		<div id="eg" title="eg?"></div>

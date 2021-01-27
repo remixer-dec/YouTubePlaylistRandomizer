@@ -78,7 +78,8 @@ input[type=checkbox] {
 
 select {
     border: none;
-    height: 16px;
+    font-size: 14px;
+    height: auto;
 }
 
 .cfg>div {
@@ -125,14 +126,17 @@ select {
     border-color: #2e7d32;
     color: #fff;
 }
+
 .info-warn {
     background: #faa726;
     border-color: #ef6c00;
     color: #d84315;
 }
+
 .info-zero {
     position: absolute;
 }
+
 label[for=sgen]:hover:before {
     content: 'pseudo';
     font-size: 8px;
@@ -141,6 +145,7 @@ label[for=sgen]:hover:before {
     display: inline-block;
     color: #ddd;
 }
+
 #eg {
     position: fixed;
     left: 0;
@@ -162,12 +167,23 @@ button[disabled]:before {
     padding: 0 10px;
 }
 
-@media (prefers-color-scheme: dark){
-    body {
-        background: #222
-    }
-    .middle {
-        color: #fff;
-        background: #222;
-    }
+div#activePlaylist > div {
+    margin: 8px 0;
+}
+
+.dark.container {
+    background: #222;
+}
+
+.dark .middle {
+    color: #fff;
+    background: #222;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .cfg {
+       width: 300px;
+       display: block;
+       margin: 0 auto;
+   }
 }

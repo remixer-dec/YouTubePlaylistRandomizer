@@ -12,7 +12,7 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
 </head>
 <body>
-	<div class="container" id="app">
+	<div class="container" id="app" :class="{'dark': cfg.darkTheme}">
     	<div class="middle">
 			<div class="bigline">
 				<span class="logo">YouTube Playlist Randomizer</span>
@@ -53,12 +53,22 @@
 						<label for="i4">Allow repetitions</label>
 					</span>
 				</div>
+				<div style="margin-top: 20px">
+					<span title="Hide controls to prevent manually switching videos">
+						<input type="checkbox" id="i5" v-model="cfg.showControls" @change="saveConfig" :disabled="!status.playerReady">
+						<label for="i5">Show controls</label>
+					</span>
+					<span title="">
+						<input type="checkbox" id="i6" v-model="cfg.darkTheme" @change="saveConfig">
+						<label for="i6">Dark theme</label>
+					</span>
+				</div>
 				<div v-if='!cfg.saveSeed' class="info info-zero info-warn">Random seed might give you more repetitions than the same seed with saved position</div>
 				<div v-if='cfg.saveSeed && !cfg.savePos' class="info info-zero info-warn">You will get the same order after every page refresh, if you're not saving the position</div>
 			</div>
 			<div id="activePlaylist" v-show="tab == 2">
 				<div>Current playlist: {{playlistIDShort}} ({{cfg.videos}} videos) <button type="button" name="button" @click="editPlaylist">Edit</button></div>
-				<div>Seed: {{cfg.seed}}. Iterations: {{cfg.pos}}. Completions: 0</div>
+				<div>Seed: {{cfg.seed}} | Position: {{cfg.pos+1}}/{{cfg.videos}} | Completions: {{cfg.lap}}</div>
 			</div>
 			<div class="playerwrap" v-show="tab == 2">
 				<div id="player"></div>

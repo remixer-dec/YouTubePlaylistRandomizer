@@ -52,11 +52,16 @@ function onPlayerReady(event) {
 
 function onPlayerStateChange(event) {
     switch (event.data) {
-        case YT.PlayerState.ENDED:
+        case YT.PlayerState.UNSTARTED:
+            if (app.lastPlayerPos === player.getPlaylistIndex() || app.freezeunstart)
+                break
             app.playNextVideo()
+            app.lastPlayerPos = player.getPlaylistIndex()
         break
         case YT.PlayerState.PLAYING:
-                app.status.playlistLoaded = true
+            app.lastPlayerPos = player.getPlaylistIndex()
+            app.freezeunstart = false
+            app.status.playlistLoaded = true
         break
     }
     console.log('playstate', event.data)
@@ -66,6 +71,8 @@ var app = new Vue({
     'el': '#app',
     'data': {
         'tab': 1,
+        'lastPlayerPos': 0,
+        'freezeunstart': true,
         'initcfg': function() {
             return {
                 'rng': 3,
@@ -164,6 +171,7 @@ var app = new Vue({
             this.saveConfig()
         },
         'playNextVideo': function() {
+            app.freezeunstart = true
             this.cfg.pos += 1
             if (this.cfg.pos == this.cfg.videos) {
                 this.cfg.lap += 1
@@ -172,9 +180,10 @@ var app = new Vue({
                 this.randomizePlaylist()
             }
             this.saveConfig()
-            player.playVideoAt(this.playlist[this.cfg.pos])
+            if (this.playlist) player.playVideoAt(this.playlist[this.cfg.pos])
         },
         'playPrevVideo': function() {
+            app.freezeunstart = true
             if (this.cfg.pos > 0) {
                 this.cfg.pos -= 1
             }
@@ -201,6 +210,7 @@ var app = new Vue({
                 this.cfg.seed = this.cfg.seed || Date.now()
                 this.randomizePlaylist()
                 this.cfg.pos = this.cfg.saveSeed ? this.cfg.pos : 0
+                app.freezeunstart = true
                 player.playVideoAt(this.playlist[this.cfg.pos])
             }
         },

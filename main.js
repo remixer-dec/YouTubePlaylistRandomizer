@@ -33,7 +33,7 @@ function onPlayerReady(event) {
     app.status.playerReady = true
     if (app.cfg.savePlaylist && app.cfg.playlistID && !app.status.controlsBoxClicked) {
         if ('userActivation' in window.navigator) {
-            if (!window.navigator.userActivation.hasBeenActive && app.status.isMobileDevice) {
+            if (!window.navigator.userActivation.hasBeenActive) {
                 app.msg('warn', 'Please click here to load saved playlist.')
                 var iv = setInterval(function() {
                     if (window.navigator.userActivation.hasBeenActive) {

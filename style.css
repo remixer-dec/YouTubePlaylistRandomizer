@@ -213,7 +213,7 @@ div#activePlaylist > div {
 }
 
 .spoiler:hover:before {
-    content: 'With this playlist randomizer, you can shuffle public YouTube playlists in many different ways and save your playlist, random seed and progress, so you can close this app, and when you open it again, you\'ll continue playing your shuffled playlist.';
+    content: 'With this playlist randomizer, you can shuffle public YouTube playlists in many different ways and save your playlist, random seed and progress, so you can close this app, and when you open it again, you\'ll continue playing your shuffled playlist. Due to API restrictions, in large playlists only first 200 videos can be shuffled.';
     margin-left: 10px;
 }
 

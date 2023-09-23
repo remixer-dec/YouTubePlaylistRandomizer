@@ -124,7 +124,7 @@ var app = new Vue({
                 if (!that.status.playlistLoaded && player.getPlayerState() == 5) {
                     that.msg('error', 'Unable to load the playlist. Please check if it\'s public.')
                 }
-                if (!that.status.playlistLoaded && player.getPlayerState() == -1 && that.status.noUserActivationEvent) {
+                if (!that.status.playlistLoaded && (player.getPlayerState() == -1 || player.getPlayerState() == 2) && that.status.noUserActivationEvent) {
                     that.msg('warn', 'Cannot load playlist automatically. Click here to do it manually.')
                     that.status.autoPlaylistLoaderFailed = true
                 }

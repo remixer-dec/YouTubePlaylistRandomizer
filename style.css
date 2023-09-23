@@ -58,6 +58,10 @@ button {
     cursor: pointer;
 }
 
+button svg {
+    transform: scale(1.4)
+}
+
 button:hover {
     box-shadow: inset 0 0 4px rgba(0, 0, 0, .44);
     background: #b41b1b;
@@ -215,6 +219,16 @@ div#activePlaylist > div {
 .spoiler:hover:before {
     content: 'With this playlist randomizer, you can shuffle public YouTube playlists in many different ways and save your playlist, random seed and progress, so you can close this app, and when you open it again, you\'ll continue playing your shuffled playlist. Due to API restrictions, in large playlists only first 200 videos can be shuffled.';
     margin-left: 10px;
+}
+
+#star {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.dark #star {
+    filter: invert(1);
 }
 
 @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {

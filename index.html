@@ -10,6 +10,9 @@
 	<link rel="stylesheet" href="style.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/flexibility/2.0.1/flexibility.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
+	<style>
+		[v-cloak] {display: none !important;}
+	</style>
 </head>
 <body>
 	<div class="container" id="app" :class="{'dark': cfg.darkTheme}">
@@ -19,7 +22,7 @@
 			</div>
     		<div class="bigline" v-show="tab == 1">
 				<input type="text" v-model="cfg.playlistURL" placeholder="YouTube Playlist Link" id="link" @keyup.Enter="okClicked" :disabled="!status.playerReady"> <button id="ok" @click="okClicked" :disabled="!status.playerReady">OK</button>
-				<div id="info" :class="infoClass" v-show="info" @click="infoBarClicked">{{info}}</div>
+				<div id="info" :class="infoClass" v-show="info" @click="infoBarClicked" v-cloak>{{info}}</div>
 			</div>
 			<div class="gencfg" v-show="tab == 1">
 				<label for="sgen">Random Number Generator: </label>
@@ -64,28 +67,44 @@
 					</span>
 				</div>
 				<div class="mt20 spoiler">❓<br></div>
-				<div v-if='!cfg.saveSeed' class="info info-zero info-warn">Random seed might give you more repetitions than the same seed with saved position</div>
-				<div v-if='cfg.saveSeed && !cfg.savePos' class="info info-zero info-warn">You will get the same order after every page refresh, if you're not saving the position</div>
+				<div v-cloak v-if='!cfg.saveSeed' class="info info-zero info-warn">Random seed might give you more repetitions than the same seed with saved position</div>
+				<div v-cloak v-if='cfg.saveSeed && !cfg.savePos' class="info info-zero info-warn">You will get the same order after every page refresh, if you're not saving the position</div>
 			</div>
-			<div id="activePlaylist" v-show="tab == 2">
+			<div id="activePlaylist" v-show="tab == 2" v-cloak>
 				<div>Current playlist: {{playlistIDShort}} ({{cfg.videos}} videos) <button type="button" id="editBtn" name="button" @click="editPlaylist">Edit</button></div>
 				<div>Seed: {{cfg.seed}} | Position: {{cfg.pos+1}}/{{cfg.videos}} | Completions: {{cfg.lap}}</div>
 			</div>
 			<div class="playerwrap" v-show="tab == 2">
 				<div id="player"></div>
 			</div>
-			<div class="mt20 controls" v-show="tab == 2">
-				<button @click="playPrevVideo" :disabled="cfg.pos == 0">⏮</button>
-				<button @click="playPause">⏯</button>
-				<button @click="playNextVideo">⏭</button>
+			<div class="mt20 controls" v-show="tab == 2" v-cloak>
+				<button @click="playPrevVideo" :disabled="cfg.pos == 0" title="⏮">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+						<path fill="#fff" d="M9.2 18.44c1.25.71 2.8-.19 2.8-1.63v-2.34l6.95 3.97c1.25.71 2.8-.19 2.8-1.63V8.7a1.87 1.87 0 0 0-2.8-1.63L12 11.03V8.69a1.88 1.88 0 0 0-2.8-1.63l-7.11 4.06a1.87 1.87 0 0 0 0 3.26l7.1 4.06Z"/>
+					</svg>					
+				</button>
+				<button @click="playPause" title="⏯">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+						<path fill="#fff" d="M15 6.75a.75.75 0 0 0-.75.75V18a.75.75 0 0 0 .75.75h.75a.75.75 0 0 0 .75-.75V7.5a.75.75 0 0 0-.75-.75H15Zm5.25 0a.75.75 0 0 0-.75.75V18c0 .41.34.75.75.75H21a.75.75 0 0 0 .75-.75V7.5a.75.75 0 0 0-.75-.75h-.75Zm-15.2.31a1.88 1.88 0 0 0-2.8 1.63v8.12a1.87 1.87 0 0 0 2.8 1.63l7.11-4.06a1.87 1.87 0 0 0 0-3.26l-7.1-4.06Z"/>
+					</svg>					
+				</button>
+				<button @click="playNextVideo" title="⏭">
+					<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+						<path fill="#fff" d="M5.05 7.06a1.88 1.88 0 0 0-2.8 1.63v8.12a1.87 1.87 0 0 0 2.8 1.63L12 14.47v2.34a1.87 1.87 0 0 0 2.8 1.63l7.11-4.06a1.87 1.87 0 0 0 0-3.26l-7.1-4.06A1.88 1.88 0 0 0 12 8.69v2.34L5.05 7.06Z"/>
+					</svg>
+				</button>
 			</div>
     	</div>
 		<div id="eg" title="eg?"></div>
+		<div id="star">
+			<a class="github-button" href="https://github.com/remixer-dec/YouTubePlaylistRandomizer" data-icon="octicon-star" data-size="large" aria-label="Star on GitHub">Star on GitHub</a>
+		</div>
 	</div>
 	<script src="seeded_randomizers.js"></script>
 	<script src="https://www.youtube.com/iframe_api"></script>
 	<script src="func.js"></script>
-  <script src="main.js"></script>
+	<script src="main.js"></script>
+	<script async defer src="https://buttons.github.io/buttons.js"></script>
 	<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7d57976f302942c4bd84a847adf5c49c"}'></script>
 </body>
 </html>
